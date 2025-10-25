@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, make_response, request
+from flask import Blueprint, abort, make_response, request, Response
 from app.models.cat import Cat
 from ..db import db
 
@@ -34,19 +34,47 @@ def get_all_cats():
         cats_response.append(dict(id=cat.id, name=cat.name, color=cat.color, personality=cat.personality))
     return cats_response
 
-# def validate_cat_id(id):
-#     '''
-#     Checks if a cat with a given id exists. If id is incorrect type, returns 400 bad request error. If id does not exist in cats (list), returns 404 not found. If cat id found, returns the instance of cat.
-#     '''
-#     try:
-#         cat_id = int(id)
-#     except:
-#         response = {'message': f'cat {id} invalid'}
-#         abort(make_response(response, 400))
-    
-#     for cat in cats:
-#         if cat.id == cat_id:
-#             return cat
+@cats_bp.get('/<cat_id>')
+def get_one_cat(cat_id):
+    cat = validate_cat(cat_id)
 
-#     response = {'message': f'cat {cat_id} does not exist'}
-#     abort(make_response(response, 404))
+    return dict(id=cat.id, name=cat.name, color=cat.color, personality=cat.personality)
+
+def validate_cat(id):
+    '''
+    Checks if a cat with a given id exists. If id is incorrect type, returns 400 bad request error. If id does not exist in cats (list), returns 404 not found. If cat id found, returns the instance of cat.
+    '''
+    try:
+        cat_id = int(id)
+    except:
+        response = {'message': f'cat {id} invalid'}
+        abort(make_response(response, 400))
+    
+    query = db.select(Cat).where(Cat.id == cat_id)
+    cat = db.session.scalar(query)
+
+    if not cat:
+        response = {'message': f'cat {cat_id} does not exist'}
+        abort(make_response(response, 404))
+    
+    return cat
+
+@cats_bp.put('/<cat_id>')
+def update_cat(cat_id):
+    cat = validate_cat(cat_id)
+    request_body = request.get_json()
+
+    cat.name = request_body['name']
+    cat.color = request_body['color']
+    cat.personality = request_body['personality']
+    db.session.commit()
+
+    return Response(status=204, mimetype='application/json')
+
+@cats_bp.delete('/<cat_id>')
+def delete_cat(cat_id):
+    cat = validate_cat(cat_id)
+    db.session.delete(cat)
+    db.session.commit()
+    
+    return Response(status=204, mimetype='applications/json')
