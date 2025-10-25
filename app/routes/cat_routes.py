@@ -1,9 +1,29 @@
-from flask import Blueprint, abort, make_response
+from flask import Blueprint, abort, make_response, request
+from app.models.cat import Cat
+from ..db import db
 
 cats_bp = Blueprint('cats_bp', __name__, url_prefix='/cats')
 
+@cats_bp.post('')
+def create_cat():
+    request_body = request.get_json()
 
+    name = request_body['name']
+    color = request_body['color']
+    personality = request_body['personality']
 
+    new_cat = Cat(name=name, color=color, personality=personality)
+    db.session.add(new_cat)
+    db.session.commit()
+    
+    response = {
+        'id': new_cat.id,
+        'name': new_cat.name,
+        'color': new_cat.color,
+        'personality': new_cat.personality
+    }
+
+    return response, 201
 # def validate_cat_id(id):
 #     '''
 #     Checks if a cat with a given id exists. If id is incorrect type, returns 400 bad request error. If id does not exist in cats (list), returns 404 not found. If cat id found, returns the instance of cat.
