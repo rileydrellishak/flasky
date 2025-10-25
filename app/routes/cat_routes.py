@@ -15,7 +15,7 @@ def create_cat():
     new_cat = Cat(name=name, color=color, personality=personality)
     db.session.add(new_cat)
     db.session.commit()
-    
+
     response = {
         'id': new_cat.id,
         'name': new_cat.name,
@@ -24,6 +24,16 @@ def create_cat():
     }
 
     return response, 201
+
+@cats_bp.get('')
+def get_all_cats():
+    query = db.select(Cat).order_by(Cat.id)
+    cats = db.session.scalars(query)
+    cats_response = []
+    for cat in cats:
+        cats_response.append(dict(id=cat.id, name=cat.name, color=cat.color, personality=cat.personality))
+    return cats_response
+
 # def validate_cat_id(id):
 #     '''
 #     Checks if a cat with a given id exists. If id is incorrect type, returns 400 bad request error. If id does not exist in cats (list), returns 404 not found. If cat id found, returns the instance of cat.
