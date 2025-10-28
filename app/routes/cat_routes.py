@@ -34,9 +34,9 @@ def get_all_cats():
         cats_response.append(dict(id=cat.id, name=cat.name, color=cat.color, personality=cat.personality))
     return cats_response
 
-@cats_bp.get('/<cat_id>')
-def get_one_cat(cat_id):
-    cat = validate_cat(cat_id)
+@cats_bp.get('/<id>')
+def get_one_cat(id):
+    cat = validate_cat(id)
 
     return dict(id=cat.id, name=cat.name, color=cat.color, personality=cat.personality)
 
@@ -45,23 +45,23 @@ def validate_cat(id):
     Checks if a cat with a given id exists. If id is incorrect type, returns 400 bad request error. If id does not exist in cats (list), returns 404 not found. If cat id found, returns the instance of cat.
     '''
     try:
-        cat_id = int(id)
+        id = int(id)
     except:
         response = {'message': f'cat {id} invalid'}
         abort(make_response(response, 400))
     
-    query = db.select(Cat).where(Cat.id == cat_id)
+    query = db.select(Cat).where(Cat.id == id)
     cat = db.session.scalar(query)
 
     if not cat:
-        response = {'message': f'cat {cat_id} does not exist'}
+        response = {'message': f'cat {id} does not exist'}
         abort(make_response(response, 404))
     
     return cat
 
-@cats_bp.put('/<cat_id>')
-def update_cat(cat_id):
-    cat = validate_cat(cat_id)
+@cats_bp.put('/<id>')
+def replace_cat(id):
+    cat = validate_cat(id)
     request_body = request.get_json()
 
     cat.name = request_body['name']
@@ -71,9 +71,9 @@ def update_cat(cat_id):
 
     return Response(status=204, mimetype='application/json')
 
-@cats_bp.delete('/<cat_id>')
-def delete_cat(cat_id):
-    cat = validate_cat(cat_id)
+@cats_bp.delete('/<id>')
+def delete_cat(id):
+    cat = validate_cat(id)
     db.session.delete(cat)
     db.session.commit()
     
