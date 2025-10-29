@@ -28,6 +28,19 @@ def create_dog():
 @dogs_bp.get('')
 def get_all_dogs():
     query = db.select(Dog).order_by(Dog.id)
+
+    name_param = request.args.get('name')
+    if name_param:
+        query = query.where(Dog.name == name_param)
+
+    breed_param = request.args.get('breed')
+    if breed_param:
+        query = query.where(Dog.breed.ilike(f"%{breed_param}%"))
+
+    personality_param = request.args.get('personality')
+    if personality_param:
+        query = query.where(Dog.personality.ilike(f"%{personality_param}%"))
+
     dogs = db.session.scalars(query)
     dogs_response = []
     for dog in dogs:
