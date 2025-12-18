@@ -4,6 +4,7 @@ from .db import db, migrate
 from app.routes.cat_routes import cats_bp
 from app.routes.dog_routes import dogs_bp
 import os
+from .models import caretaker
 
 def create_app(config=None):
     # __name__ stores the name of the module we're in
