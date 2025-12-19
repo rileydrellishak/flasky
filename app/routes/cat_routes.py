@@ -38,6 +38,17 @@ def update_cat(id):
     request_body = request.get_json()
     return update_model(cat, request_body), 200
 
+@bp.patch('/<id>/pet')
+def pet_cat(id):
+    cat = validate_model(Cat, id)
+    if not cat.pet_count:
+        cat.pet_count = 1
+    else:
+        cat.pet_count += 1
+        
+    db.session.commit()
+    return Response(status=204, mimetype='applications/json')
+
 @bp.delete('/<id>')
 def delete_cat(id):
     cat = validate_model(Cat, id)
