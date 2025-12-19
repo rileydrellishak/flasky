@@ -10,6 +10,7 @@ class Cat(db.Model):
     personality: Mapped[str]
     caretaker_id: Mapped[Optional[int]] = mapped_column(ForeignKey('caretaker.id'))
     caretaker: Mapped[Optional['Caretaker']] = relationship(back_populates='cats')
+    pet_count: Mapped[Optional[int]]
 
     @classmethod
     def from_dict(cls, cat_data):
@@ -18,7 +19,8 @@ class Cat(db.Model):
             color=cat_data['color'],
             personality=cat_data['personality'],
             caretaker_id=cat_data.get('caretaker_id', None),
-            caretaker=cat_data.get('caretaker', None)
+            caretaker=cat_data.get('caretaker', None),
+            pet_count=cat_data.get('pet_count', 0)
             )
         
         return new_cat
@@ -29,6 +31,7 @@ class Cat(db.Model):
         cat_dict['name'] = self.name
         cat_dict['personality'] = self.personality
         cat_dict['color'] = self.color
+        cat_dict['pet_count'] = self.pet_count if self.pet_count else 0
         
         if self.caretaker_id is not None:
             cat_dict["caretaker_id"] = self.caretaker_id

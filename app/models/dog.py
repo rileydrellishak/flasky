@@ -10,6 +10,7 @@ class Dog(db.Model):
     personality: Mapped[str]
     caretaker_id: Mapped[Optional[int]] = mapped_column(ForeignKey('caretaker.id'))
     caretaker: Mapped[Optional['Caretaker']] = relationship(back_populates='dogs')
+    pet_count: Mapped[Optional[int]]
 
     @classmethod
     def from_dict(cls, dog_data):
@@ -18,7 +19,8 @@ class Dog(db.Model):
             breed=dog_data['breed'],
             personality=dog_data['personality'],
             caretaker_id=dog_data.get('caretaker_id', None),
-            caretaker=dog_data.get('caretaker', None)
+            caretaker=dog_data.get('caretaker', None),
+            pet_count=dog_data.get('pet_count', 0)
             )
         
         return new_dog
@@ -29,6 +31,7 @@ class Dog(db.Model):
         dog_dict['name'] = self.name
         dog_dict['personality'] = self.personality
         dog_dict['breed'] = self.breed
+        dog_dict['pet_count'] = self.pet_count if self.pet_count else 0
         
         if self.caretaker_id is not None:
             dog_dict["caretaker_id"] = self.caretaker_id
