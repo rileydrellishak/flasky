@@ -1,10 +1,11 @@
 from flask import Flask
 from flask_cors import CORS
 from .db import db, migrate
-from app.routes.cat_routes import cats_bp
-from app.routes.dog_routes import dogs_bp
+from app.routes.cat_routes import bp as cats_bp
+from app.routes.dog_routes import bp as dogs_bp
 import os
 from .models import caretaker
+from app.routes.caretaker_routes import bp as caretakers_bp
 
 def create_app(config=None):
     # __name__ stores the name of the module we're in
@@ -22,5 +23,6 @@ def create_app(config=None):
 
     app.register_blueprint(cats_bp)
     app.register_blueprint(dogs_bp)
+    app.register_blueprint(caretakers_bp)
 
     return app

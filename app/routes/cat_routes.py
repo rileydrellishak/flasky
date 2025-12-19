@@ -3,30 +3,19 @@ from app.models.cat import Cat
 from ..db import db
 from .route_utilities import validate_model
 
-cats_bp = Blueprint('cats_bp', __name__, url_prefix='/cats')
+bp = Blueprint('cats_bp', __name__, url_prefix='/cats')
 
-@cats_bp.post('')
+@bp.post('')
 def create_cat():
     request_body = request.get_json()
 
-    name = request_body['name']
-    color = request_body['color']
-    personality = request_body['personality']
-
-    new_cat = Cat(name=name, color=color, personality=personality)
+    new_cat = Cat.from_dict(request_body)
     db.session.add(new_cat)
     db.session.commit()
 
-    response = {
-        'id': new_cat.id,
-        'name': new_cat.name,
-        'color': new_cat.color,
-        'personality': new_cat.personality
-    }
+    return new_cat.to_dict(), 201
 
-    return response, 201
-
-@cats_bp.get('')
+@bp.get('')
 def get_all_cats():
     query = db.select(Cat)
 
@@ -49,13 +38,13 @@ def get_all_cats():
         cats_response.append(cat.to_dict())
     return cats_response
 
-@cats_bp.get('/<id>')
+@bp.get('/<id>')
 def get_one_cat(id):
     cat = validate_model(Cat, id)
 
     return cat.to_dict()
 
-@cats_bp.put('/<id>')
+@bp.put('/<id>')
 def replace_cat(id):
     cat = validate_model(Cat, id)
     request_body = request.get_json()
@@ -63,11 +52,12 @@ def replace_cat(id):
     cat.name = request_body['name']
     cat.color = request_body['color']
     cat.personality = request_body['personality']
+    cat.caretaker_id = request_body['caretaker_id']
     db.session.commit()
 
     return Response(status=204, mimetype='application/json')
 
-@cats_bp.delete('/<id>')
+@bp.delete('/<id>')
 def delete_cat(id):
     cat = validate_model(Cat, id)
     db.session.delete(cat)
