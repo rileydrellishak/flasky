@@ -10,14 +10,16 @@ def test_get_all_cats_with_records(client, two_cats):
     response_body = response.get_json()
 
     assert response.status_code == 200
-    assert response_body == [dict(name='George', color='Gray', personality='Neutral', id=1), dict(name='Butters', color='White', personality='Playful', id=2)]
+    assert response_body == [
+        dict(name='George', color='Gray', personality='Neutral', id=1, caretaker_id=1, caretaker='Nana'), 
+        dict(name='Butters', color='White', personality='Playful', id=2, caretaker_id=2, caretaker='Alexis')]
 
 def test_get_one_cat_by_id_success(client, two_cats):
     response = client.get('/cats/1')
     response_body = response.get_json()
 
     assert response.status_code == 200
-    assert response_body == dict(name='George', color='Gray', personality='Neutral', id=1)
+    assert response_body == dict(name='George', color='Gray', personality='Neutral', id=1, caretaker_id=1, caretaker='Nana')
 
 def test_get_one_cat_by_id_404(client, two_cats):
     response = client.get('/cats/3')

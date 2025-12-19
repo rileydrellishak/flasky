@@ -12,5 +12,26 @@ class Cat(db.Model):
     caretaker: Mapped[Optional['Caretaker']] = relationship(back_populates='cats')
 
     @classmethod
-    def from_dict(cls):
-        pass
+    def from_dict(cls, cat_data):
+        new_cat = Cat(
+            name=cat_data['name'],
+            color=cat_data['color'],
+            personality=cat_data['personality'],
+            caretaker_id=cat_data.get('caretaker_id', None),
+            caretaker=cat_data.get('caretaker', None)
+            )
+        
+        return new_cat
+
+    def to_dict(self):
+        cat_dict = {}
+        cat_dict['id'] = self.id
+        cat_dict['name'] = self.name
+        cat_dict['personality'] = self.personality
+        cat_dict['color'] = self.color
+        
+        if self.caretaker_id is not None:
+            cat_dict["caretaker_id"] = self.caretaker_id
+            cat_dict["caretaker"] = self.caretaker.name if self.caretaker else None
+
+        return cat_dict

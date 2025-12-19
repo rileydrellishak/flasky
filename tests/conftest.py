@@ -5,6 +5,7 @@ from flask.signals import request_finished
 from dotenv import load_dotenv
 import os
 from app.models.cat import Cat
+from app.models.caretaker import Caretaker
 
 load_dotenv()
 
@@ -34,7 +35,13 @@ def client(app):
 
 @pytest.fixture
 def two_cats(client):
-    cat_1 = Cat(name='George', color='Gray', personality='Neutral')
-    cat_2 = Cat(name='Butters', color='White', personality='Playful')
+    ct_1 = Caretaker(name='Nana')
+    ct_2 = Caretaker(name='Alexis')
+    db.session.add_all([ct_1, ct_2])
+    db.session.commit()
+
+    cat_1 = Cat(name='George', color='Gray', personality='Neutral', caretaker_id=ct_1.id)
+    cat_2 = Cat(name='Butters', color='White', personality='Playful', caretaker_id=ct_2.id)
+    
     db.session.add_all([cat_1, cat_2])
     db.session.commit()

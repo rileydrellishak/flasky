@@ -6,4 +6,8 @@ bp = Blueprint('bp', __name__, url_prefix='/caretakers')
 
 @bp.get('')
 def get_all_caretakers():
+    query = db.select(Caretaker)
+
+@bp.post('')
+def create_caretaker():
     pass

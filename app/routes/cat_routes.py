@@ -46,14 +46,14 @@ def get_all_cats():
     cats = db.session.scalars(query)
     cats_response = []
     for cat in cats:
-        cats_response.append(dict(id=cat.id, name=cat.name, color=cat.color, personality=cat.personality))
+        cats_response.append(cat.to_dict())
     return cats_response
 
 @cats_bp.get('/<id>')
 def get_one_cat(id):
     cat = validate_model(Cat, id)
 
-    return dict(id=cat.id, name=cat.name, color=cat.color, personality=cat.personality)
+    return cat.to_dict()
 
 @cats_bp.put('/<id>')
 def replace_cat(id):
