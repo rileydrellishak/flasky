@@ -1,48 +1,23 @@
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.cat import Cat
 from ..db import db
-from .route_utilities import validate_model
+from .route_utilities import create_model, get_models_with_filters, update_model, validate_model
 
 bp = Blueprint('cats_bp', __name__, url_prefix='/cats')
 
 @bp.post('')
 def create_cat():
     request_body = request.get_json()
-
-    new_cat = Cat.from_dict(request_body)
-    db.session.add(new_cat)
-    db.session.commit()
-
-    return new_cat.to_dict(), 201
+    return create_model(Cat, request_body), 201
 
 @bp.get('')
 def get_all_cats():
-    query = db.select(Cat)
-
-    name_param = request.args.get('name')
-    if name_param:
-        query = query.where(Cat.name == name_param)
-
-    color_param = request.args.get('color')
-    if color_param:
-        query = query.where(Cat.color.ilike(f"%{color_param}%"))
-    
-    personality_param = request.args.get('personality')
-    if personality_param:
-        query = query.where(Cat.personality.ilike(f"%{personality_param}%"))
-
-    query = query.order_by(Cat.id)
-    cats = db.session.scalars(query)
-    cats_response = []
-    for cat in cats:
-        cats_response.append(cat.to_dict())
-    return cats_response
+    return get_models_with_filters(Cat, request.args), 200
 
 @bp.get('/<id>')
 def get_one_cat(id):
     cat = validate_model(Cat, id)
-
-    return cat.to_dict()
+    return cat.to_dict(), 200
 
 @bp.put('/<id>')
 def replace_cat(id):
@@ -56,6 +31,12 @@ def replace_cat(id):
     db.session.commit()
 
     return Response(status=204, mimetype='application/json')
+
+@bp.patch('/id')
+def update_cat(id):
+    cat = validate_model(Cat, id)
+    request_body = request.get_json()
+    return update_model(cat, request_body), 200
 
 @bp.delete('/<id>')
 def delete_cat(id):
