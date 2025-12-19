@@ -24,14 +24,14 @@ def test_get_one_cat_by_id_404(client, two_cats):
     response_body = response.get_json()
 
     assert response.status_code == 404
-    assert response_body == {'message': f'cat 3 does not exist'}
+    assert response_body == {'message': f'Cat 3 does not exist'}
 
 def test_get_one_cat_by_id_400(client, two_cats):
     response = client.get('/cats/hi')
     response_body = response.get_json()
 
     assert response.status_code == 400
-    assert response_body == {'message': f'cat hi invalid'}
+    assert response_body == {'message': f'Cat hi invalid'}
 
 def test_create_one_cat_success(client):
     response = client.post('/cats', json={'name':'Butters', 'color':'White', 'personality':'Playful'})

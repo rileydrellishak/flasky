@@ -9,4 +9,8 @@ class Cat(db.Model):
     color: Mapped[str]
     personality: Mapped[str]
     caretaker_id: Mapped[Optional[int]] = mapped_column(ForeignKey('caretaker.id'))
-    caretaker_name: Mapped[Optional['Caretaker']] = relationship(back_populates='caretakers')
+    caretaker: Mapped[Optional['Caretaker']] = relationship(back_populates='cats')
+
+    @classmethod
+    def from_dict(cls):
+        pass

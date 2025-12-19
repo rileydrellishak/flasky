@@ -1,6 +1,7 @@
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.cat import Cat
 from ..db import db
+from .route_utilities import validate_model
 
 cats_bp = Blueprint('cats_bp', __name__, url_prefix='/cats')
 
@@ -50,32 +51,13 @@ def get_all_cats():
 
 @cats_bp.get('/<id>')
 def get_one_cat(id):
-    cat = validate_cat(id)
+    cat = validate_model(Cat, id)
 
     return dict(id=cat.id, name=cat.name, color=cat.color, personality=cat.personality)
 
-def validate_cat(id):
-    '''
-    Checks if a cat with a given id exists. If id is incorrect type, returns 400 bad request error. If id does not exist in cats (list), returns 404 not found. If cat id found, returns the instance of cat.
-    '''
-    try:
-        id = int(id)
-    except:
-        response = {'message': f'cat {id} invalid'}
-        abort(make_response(response, 400))
-    
-    query = db.select(Cat).where(Cat.id == id)
-    cat = db.session.scalar(query)
-
-    if not cat:
-        response = {'message': f'cat {id} does not exist'}
-        abort(make_response(response, 404))
-    
-    return cat
-
 @cats_bp.put('/<id>')
 def replace_cat(id):
-    cat = validate_cat(id)
+    cat = validate_model(Cat, id)
     request_body = request.get_json()
 
     cat.name = request_body['name']
@@ -87,7 +69,7 @@ def replace_cat(id):
 
 @cats_bp.delete('/<id>')
 def delete_cat(id):
-    cat = validate_cat(id)
+    cat = validate_model(Cat, id)
     db.session.delete(cat)
     db.session.commit()
     
